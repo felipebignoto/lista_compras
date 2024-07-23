@@ -24,17 +24,19 @@ export default function Table(props: TabelaProps) {
           <tr
             key={item.itemId}
             className={`${i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'}`}
+            onClick={() => props.itemSelecionado?.(item)}
           >
-            <td className="text-left py-1 md:py-2 md:px-4 truncate text-ellipsis max-w-16 sm:max-w-fit ">
+            <td className="text-left py-1 md:py-2 md:px-4 whitespace-normal break-words">
               {item.itemNome}
             </td>
+
             <td className="text-center py-1 md:py-2 md:px-4">
               {item.itemQuantidade}
             </td>
-            <td className="h-min text-left py-1 md:py-2 md:px-4 truncate text-ellipsis max-w-16 sm:max-w-fit ">
+            <td className="h-min text-left py-1 md:py-2 md:px-4 whitespace-normal break-all">
               {item.itemObservacao}
             </td>
-            <td className="flex md:gap-2 text-left py-1 md:py-2 md:px-4">
+            <td className="flex md:gap-2 py-1 m-auto md:py-2 md:px-4 justify-center items-center">
               <Button
                 className="hover:bg-blue-600"
                 color="blue"
