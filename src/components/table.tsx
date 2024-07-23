@@ -14,7 +14,7 @@ export default function Table(props: TabelaProps) {
       <thead className="">
         <tr className="bg-gray-300">
           <th className="text-center p-1 md:p-4">Nome</th>
-          <th className="text-center p-1 md:p-4">Quantidade</th>
+          <th className="text-center p-1 md:p-4">quant.</th>
           <th className="text-center p-1 md:p-4">Aviso</th>
           <th className="text-center p-1 md:p-4">Ações</th>
         </tr>
