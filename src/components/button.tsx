@@ -10,6 +10,7 @@ interface ButtonProps {
 
 export default function Button(props: ButtonProps) {
   const isIcon = props.isIcon ?? false
+
   return (
     <button
       onClick={props.onClick}

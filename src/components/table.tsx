@@ -23,17 +23,31 @@ export default function Table(props: TabelaProps) {
         {props.item?.map((item, i) => (
           <tr
             key={item.itemId}
-            className={`${i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'} `}
-            onClick={() => props.itemSelecionado?.(item)}
+            className={`${i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'} w-full `}
           >
-            <td className="text-left py-1 md:py-2 md:px-4 whitespace-normal break-words">
+            <td
+              onClick={() => {
+                props.itemSelecionado?.(item)
+              }}
+              className="text-left py-1 md:py-2 md:px-4 whitespace-normal"
+            >
               {item.itemNome}
             </td>
 
-            <td className="text-center py-1 md:py-2 md:px-4">
+            <td
+              onClick={() => {
+                props.itemSelecionado?.(item)
+              }}
+              className="text-center py-1 md:py-2 md:px-4"
+            >
               {item.itemQuantidade}
             </td>
-            <td className="h-min text-left py-1 md:py-2 md:px-4 whitespace-normal break-all">
+            <td
+              onClick={() => {
+                props.itemSelecionado?.(item)
+              }}
+              className="h-min text-left py-1 md:py-2 md:px-4 whitespace-normal "
+            >
               {item.itemObservacao}
             </td>
             <td className="md:gap-2 py-1 md:py-2 md:px-4">
@@ -42,12 +56,14 @@ export default function Table(props: TabelaProps) {
                   className="hover:bg-blue-600"
                   color="blue"
                   isIcon
-                  onClick={() => props.itemSelecionado?.(item)}
+                  onClick={() => {
+                    props.itemSelecionado?.(item)
+                  }}
                 >
                   <Pencil className="h-5 w-5 md:h-6 md:w-6" />
                 </Button>
                 <Button
-                  className="hover:bg-red-600"
+                  className="hover:bg-red-600 z-10"
                   color="red"
                   isIcon
                   onClick={() => props.itemExcluido?.(item)}
