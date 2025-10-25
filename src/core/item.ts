@@ -7,6 +7,7 @@ export default class Item {
   private createdBy?: string | undefined | null
   private createdAt?: number | undefined | null
   private updatedAt?: number | undefined | null
+  private checked: boolean
 
   constructor(
     nome: string,
@@ -17,6 +18,7 @@ export default class Item {
     createdBy: string | null = null,
     createdAt: number | null = null,
     updatedAt: number | null = null,
+    checked: boolean = false,
   ) {
     this.id = id
     this.nome = nome
@@ -26,10 +28,11 @@ export default class Item {
     this.createdBy = createdBy
     this.createdAt = createdAt
     this.updatedAt = updatedAt
+    this.checked = checked
   }
 
   static vazio() {
-    return new Item('', 1, '')
+    return new Item('', 1, '', null, null, null, null, null, false)
   }
 
   get itemId() {
@@ -62,5 +65,9 @@ export default class Item {
 
   get itemUpdatedAt() {
     return this.updatedAt
+  }
+
+  get itemChecked() {
+    return this.checked
   }
 }

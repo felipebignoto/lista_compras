@@ -18,15 +18,15 @@ export default function Form(props: FormProps) {
   const [observacao, setobservacao] = useState(props.item.itemObservacao ?? '')
   const id = props.item?.itemId
   return (
-    <div className=" p-4 bg-gray-100 border-2 border-black">
+    <div className="w-full max-w-2xl p-6 bg-slate-50 border border-slate-300 rounded-2xl shadow-xl">
       <Title title={props.title}></Title>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5 mt-6">
         <div className="flex flex-col gap-2">
-          <label>Nome: </label>
+          <label className="text-slate-700 font-medium text-sm">Nome</label>
           <Input onChange={setNome} value={nome} type="text"></Input>
         </div>
         <div className="flex flex-col gap-2">
-          <label>Quantidade: </label>
+          <label className="text-slate-700 font-medium text-sm">Quantidade</label>
           <Input
             onChange={setquantidade}
             value={quantidade}
@@ -34,7 +34,7 @@ export default function Form(props: FormProps) {
           ></Input>
         </div>
         <div className="flex flex-col gap-2">
-          <label>Observação: </label>
+          <label className="text-slate-700 font-medium text-sm">Observação</label>
           <Input
             onChange={setobservacao}
             value={observacao}
@@ -43,14 +43,20 @@ export default function Form(props: FormProps) {
         </div>
       </div>
 
-      <div className="flex justify-end mt-2 gap-2">
-        <Button onClick={props.canceled} color="red" text="Cancelar" />
+      <div className="flex justify-end mt-6 gap-3">
+        <Button 
+          onClick={props.canceled} 
+          color="red" 
+          text="Cancelar"
+          className="bg-red-100 hover:bg-red-200 border border-red-300 text-red-700"
+        />
         <Button
           onClick={() =>
             props.itemChanged?.(new Item(nome, +quantidade, observacao, id))
           }
           color="green"
           text={props.textButton}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
         />
       </div>
     </div>

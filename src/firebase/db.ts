@@ -3,6 +3,18 @@ import ItemRepo from '@/core/itemRepo'
 import firebase from './config'
 
 export default class ColecaoItem implements ItemRepo {
+  /**
+   * Retorna a subcollection de itens dentro de uma lista
+   */
+  private getItemsCollection(listId: string) {
+    return firebase
+      .firestore()
+      .collection('lists')
+      .doc(listId)
+      .collection('itens')
+      .withConverter(this.conversor)
+  }
+
   async salvar(item: Item, listId: string, userId: string): Promise<Item | undefined> {
     if (typeof window === 'undefined') return undefined
 
@@ -10,24 +22,26 @@ export default class ColecaoItem implements ItemRepo {
 
     if (item?.itemId) {
       // Atualizar item existente
-      await this.colecao().doc(item.itemId).update({
+      await this.getItemsCollection(listId).doc(item.itemId).update({
         nome: item.itemNome,
         quantidade: item.itemQuantidade,
         observacao: item.itemObservacao,
-        listId,
+        checked: item.itemChecked,
         updatedAt: now,
       })
       return item
     } else {
-      // Criar novo item - usar collection sem conversor para adicionar campos extras
+      // Criar novo item
       const docRef = await firebase
         .firestore()
+        .collection('lists')
+        .doc(listId)
         .collection('itens')
         .add({
           nome: item.itemNome,
           quantidade: item.itemQuantidade,
           observacao: item.itemObservacao,
-          listId,
+          checked: false,
           createdBy: userId,
           createdAt: now,
           updatedAt: now,
@@ -42,10 +56,11 @@ export default class ColecaoItem implements ItemRepo {
         dados.quantidade,
         dados.observacao,
         doc.id,
-        dados.listId,
+        listId,
         dados.createdBy,
         dados.createdAt,
         dados.updatedAt,
+        dados.checked,
       )
     }
   }
@@ -53,20 +68,28 @@ export default class ColecaoItem implements ItemRepo {
   async excluir(item: Item): Promise<void> {
     if (typeof window === 'undefined') return
 
-    if (item?.itemId) {
-      return this.colecao().doc(item.itemId).delete()
+    if (item?.itemId && item?.itemListId) {
+      return this.getItemsCollection(item.itemListId).doc(item.itemId).delete()
     }
   }
 
   async obterTodos(listId: string): Promise<Item[]> {
     if (typeof window === 'undefined') return []
 
-    const query = await this.colecao()
-      .where('listId', '==', listId)
+    const query = await this.getItemsCollection(listId)
       .orderBy('createdAt', 'desc')
       .get()
     
     return query.docs.map((doc) => doc.data()) ?? []
+  }
+
+  async toggleChecked(
+    itemId: string,
+    listId: string,
+    checked: boolean
+  ): Promise<void> {
+    const itemRef = this.getItemsCollection(listId).doc(itemId)
+    await itemRef.update({ checked })
   }
 
   conversor = {
@@ -75,7 +98,7 @@ export default class ColecaoItem implements ItemRepo {
         nome: item.itemNome,
         quantidade: item.itemQuantidade,
         observacao: item.itemObservacao,
-        listId: item.itemListId,
+        checked: item.itemChecked,
         createdBy: item.itemCreatedBy,
         createdAt: item.itemCreatedAt,
         updatedAt: item.itemUpdatedAt,
@@ -91,18 +114,12 @@ export default class ColecaoItem implements ItemRepo {
         dados.quantidade,
         dados.observacao,
         snapshot?.id,
-        dados.listId,
+        snapshot.ref.parent.parent?.id || '', // listId from parent
         dados.createdBy,
         dados.createdAt,
         dados.updatedAt,
+        dados.checked || false,
       )
     },
-  }
-
-  private colecao() {
-    return firebase
-      .firestore()
-      .collection('itens')
-      .withConverter(this.conversor)
   }
 }

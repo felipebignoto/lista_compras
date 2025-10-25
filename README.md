@@ -244,11 +244,6 @@ npm run lint     # Executa linter
 - [ ] Testes automatizados
 - [ ] Limpeza e otimização de código
 - [ ] Refatorar estrutura: itens como subcollection de lists
-- [ ] Notificações em tempo real
-- [ ] Histórico de alterações
-- [ ] Filtros e busca avançada
-- [ ] Categorias de itens
-- [ ] Dark mode
 - [ ] PWA (Progressive Web App)
 
 ## 📝 Licença
