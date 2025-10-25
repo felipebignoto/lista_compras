@@ -2,6 +2,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { auth } from '@/firebase/config'
 import { userService } from '@/firebase/users'
 import { User } from '@/types'
@@ -20,6 +21,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [firebaseUser, setFirebaseUser] = useState<firebase.User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -81,6 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await auth.signOut()
       setUser(null)
       setFirebaseUser(null)
+      // Redirecionar para home após logout
+      router.push('/')
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
       throw error

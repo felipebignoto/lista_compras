@@ -2,8 +2,9 @@
 'use client'
 
 import { ShoppingList } from '@/types'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDown, Plus, Settings } from 'lucide-react'
 import { useState } from 'react'
+import Link from 'next/link'
 
 interface ListSelectorProps {
   lists: ShoppingList[]

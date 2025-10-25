@@ -15,7 +15,8 @@ import UseTableForm from '@/hooks/useTableForm'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import { ShoppingList } from '@/types'
-import { List as ListIcon } from 'lucide-react'
+import { List as ListIcon, Settings } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth()
@@ -159,6 +160,15 @@ export default function Home() {
                 loading={loadingLists}
               />
             </div>
+            {selectedList && (
+              <Link
+                href={`/lists/${selectedList.id}`}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Gerenciar</span>
+              </Link>
+            )}
           </div>
 
           {/* Conteúdo da Lista */}
