@@ -3,7 +3,8 @@
 
 import { useAuth } from '@/contexts/AuthContext'
 import Button from './button'
-import { LogIn, LogOut, Shield, User as UserIcon } from 'lucide-react'
+import { LogIn, LogOut, Shield, User as UserIcon, Settings } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AuthButton() {
   const { user, loading, signInWithGoogle, signOut, isAdmin } = useAuth()
@@ -31,6 +32,15 @@ export default function AuthButton() {
 
   return (
     <div className="flex items-center gap-3">
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Settings className="h-4 w-4" />
+          <span className="hidden sm:inline">Admin</span>
+        </Link>
+      )}
       <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200">
         {user.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -60,7 +70,7 @@ export default function AuthButton() {
         className="hover:bg-red-700 flex items-center gap-2"
       >
         <LogOut className="h-4 w-4" />
-        <span>Sair</span>
+        <span className="hidden sm:inline">Sair</span>
       </Button>
     </div>
   )

@@ -1,7 +1,7 @@
 import Item from './item'
 
 export default interface ItemRepo {
-  salvar(item: Item): Promise<Item | undefined>
+  salvar(item: Item, listId: string, userId: string): Promise<Item | undefined>
   excluir(item: Item): Promise<void>
-  obterTodos(): Promise<Item[]>
+  obterTodos(listId: string): Promise<Item[]>
 }

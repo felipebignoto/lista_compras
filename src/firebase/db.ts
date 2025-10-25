@@ -3,16 +3,50 @@ import ItemRepo from '@/core/itemRepo'
 import firebase from './config'
 
 export default class ColecaoItem implements ItemRepo {
-  async salvar(item: Item): Promise<Item | undefined> {
+  async salvar(item: Item, listId: string, userId: string): Promise<Item | undefined> {
     if (typeof window === 'undefined') return undefined
 
+    const now = Date.now()
+
     if (item?.itemId) {
-      await this.colecao().doc(item.itemId).set(item)
+      // Atualizar item existente
+      await this.colecao().doc(item.itemId).update({
+        nome: item.itemNome,
+        quantidade: item.itemQuantidade,
+        observacao: item.itemObservacao,
+        listId,
+        updatedAt: now,
+      })
       return item
     } else {
-      const docRef = await this.colecao().add(item)
+      // Criar novo item - usar collection sem conversor para adicionar campos extras
+      const docRef = await firebase
+        .firestore()
+        .collection('itens')
+        .add({
+          nome: item.itemNome,
+          quantidade: item.itemQuantidade,
+          observacao: item.itemObservacao,
+          listId,
+          createdBy: userId,
+          createdAt: now,
+          updatedAt: now,
+        })
+      
       const doc = await docRef.get()
-      return doc.data()
+      const dados = doc.data()
+      if (!dados) return undefined
+      
+      return new Item(
+        dados.nome,
+        dados.quantidade,
+        dados.observacao,
+        doc.id,
+        dados.listId,
+        dados.createdBy,
+        dados.createdAt,
+        dados.updatedAt,
+      )
     }
   }
 
@@ -24,10 +58,14 @@ export default class ColecaoItem implements ItemRepo {
     }
   }
 
-  async obterTodos(): Promise<Item[]> {
+  async obterTodos(listId: string): Promise<Item[]> {
     if (typeof window === 'undefined') return []
 
-    const query = await this.colecao().get()
+    const query = await this.colecao()
+      .where('listId', '==', listId)
+      .orderBy('createdAt', 'desc')
+      .get()
+    
     return query.docs.map((doc) => doc.data()) ?? []
   }
 
@@ -37,6 +75,10 @@ export default class ColecaoItem implements ItemRepo {
         nome: item.itemNome,
         quantidade: item.itemQuantidade,
         observacao: item.itemObservacao,
+        listId: item.itemListId,
+        createdBy: item.itemCreatedBy,
+        createdAt: item.itemCreatedAt,
+        updatedAt: item.itemUpdatedAt,
       }
     },
     fromFirestore(
@@ -49,6 +91,10 @@ export default class ColecaoItem implements ItemRepo {
         dados.quantidade,
         dados.observacao,
         snapshot?.id,
+        dados.listId,
+        dados.createdBy,
+        dados.createdAt,
+        dados.updatedAt,
       )
     },
   }

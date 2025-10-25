@@ -5,12 +5,17 @@ import Form from '@/components/form'
 import Table from '@/components/table'
 import Title from '@/components/title'
 import AuthButton from '@/components/authButton'
+import ListSelector from '@/components/listSelector'
+import CreateListModal from '@/components/createListModal'
 import Item from '@/core/item'
 import ItemRepo from '@/core/itemRepo'
 import ColecaoItem from '@/firebase/db'
+import { listService } from '@/firebase/lists'
 import UseTableForm from '@/hooks/useTableForm'
 import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useState } from 'react'
+import { ShoppingList } from '@/types'
+import { List as ListIcon } from 'lucide-react'
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth()
@@ -19,12 +24,66 @@ export default function Home() {
   const { exibirFormulario, exibirTabela, tabelaVisivel } = UseTableForm()
   const repo: ItemRepo = new ColecaoItem()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Estados de listas
+  const [lists, setLists] = useState<ShoppingList[]>([])
+  const [selectedList, setSelectedList] = useState<ShoppingList | null>(null)
+  const [loadingLists, setLoadingLists] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [canWrite, setCanWrite] = useState(false)
+
+  // Carregar listas do usuário
   useEffect(() => {
     if (user) {
-      obterTodos()
+      loadUserLists()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
+
+  // Carregar itens quando selecionar uma lista
+  useEffect(() => {
+    if (selectedList) {
+      obterTodos()
+      checkWritePermission()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedList])
+
+  async function loadUserLists() {
+    if (!user) return
+    
+    setLoadingLists(true)
+    try {
+      const userLists = await listService.getListsByUser(user.uid)
+      setLists(userLists)
+      
+      // Se não tem lista selecionada, selecionar a primeira
+      if (userLists.length > 0 && !selectedList) {
+        setSelectedList(userLists[0])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar listas:', error)
+    } finally {
+      setLoadingLists(false)
+    }
+  }
+
+  async function checkWritePermission() {
+    if (!selectedList || !user) {
+      setCanWrite(false)
+      return
+    }
+    
+    const hasPermission = await listService.canWrite(selectedList.id!, user.uid)
+    setCanWrite(hasPermission)
+  }
+
+  async function handleCreateList(name: string) {
+    if (!user) return
+    
+    const newList = await listService.createList(name, user.uid)
+    setLists([newList, ...lists])
+    setSelectedList(newList)
+  }
 
   function selectedItem(item: Item) {
     setItem(item)
@@ -42,13 +101,20 @@ export default function Home() {
   }
 
   async function saveItem(item: Item) {
+    if (!selectedList?.id || !user) {
+      console.error('Lista ou usuário não definido')
+      return
+    }
+    
     console.log('save item')
-    await repo.salvar(item)
+    await repo.salvar(item, selectedList.id, user.uid)
     obterTodos()
   }
 
   function obterTodos() {
-    repo.obterTodos().then((itens) => {
+    if (!selectedList?.id) return
+    
+    repo.obterTodos(selectedList.id).then((itens) => {
       setItens(itens)
       exibirTabela()
     })
@@ -79,33 +145,92 @@ export default function Home() {
             Faça login para gerenciar suas listas de compras
           </p>
         </div>
-      ) : !tabelaVisivel ? (
-        <div className="flex justify-center">
-          <Form
-            title={item.itemNome === '' ? 'Novo Item' : 'Atualizar item'}
-            canceled={exibirTabela}
-            itemChanged={saveItem}
-            item={item}
-            textButton={item.itemNome === '' ? 'Adicionar' : 'Salvar'}
-          ></Form>
-        </div>
       ) : (
-        <div className="flex flex-col items-center gap-2">
-          <Button
-            className="hover:bg-green-700"
-            onClick={addItem}
-            color="green"
-            text="Adicionar item"
-          ></Button>
-          <div className="flex justify-center">
-            <Table
-              itemSelecionado={selectedItem}
-              itemExcluido={removeItem}
-              item={itens}
-            ></Table>
+        <div className="flex flex-col gap-4">
+          {/* Seletor de Lista */}
+          <div className="flex items-center gap-3">
+            <ListIcon className="h-5 w-5 text-gray-600" />
+            <div className="flex-1 max-w-md">
+              <ListSelector
+                lists={lists}
+                selectedList={selectedList}
+                onSelectList={setSelectedList}
+                onCreateNew={() => setShowCreateModal(true)}
+                loading={loadingLists}
+              />
+            </div>
           </div>
+
+          {/* Conteúdo da Lista */}
+          {selectedList ? (
+            !tabelaVisivel ? (
+              <div className="flex justify-center">
+                {canWrite ? (
+                  <Form
+                    title={item.itemNome === '' ? 'Novo Item' : 'Atualizar item'}
+                    canceled={exibirTabela}
+                    itemChanged={saveItem}
+                    item={item}
+                    textButton={item.itemNome === '' ? 'Adicionar' : 'Salvar'}
+                  />
+                ) : (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-yellow-800">
+                      Você não tem permissão para editar itens nesta lista
+                    </p>
+                    <button
+                      onClick={exibirTabela}
+                      className="mt-2 text-sm text-yellow-600 hover:text-yellow-800"
+                    >
+                      Voltar para lista
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                {canWrite && (
+                  <Button
+                    className="hover:bg-green-700"
+                    onClick={addItem}
+                    color="green"
+                    text="Adicionar item"
+                  />
+                )}
+                <div className="flex justify-center">
+                  <Table
+                    itemSelecionado={canWrite ? selectedItem : undefined}
+                    itemExcluido={canWrite ? removeItem : undefined}
+                    item={itens}
+                  />
+                </div>
+              </div>
+            )
+          ) : (
+            <div className="flex flex-col items-center justify-center mt-20 gap-4">
+              <p className="text-gray-600 text-center">
+                {lists.length === 0
+                  ? 'Você ainda não tem listas. Crie sua primeira lista!'
+                  : 'Selecione uma lista para começar'}
+              </p>
+              {lists.length === 0 && (
+                <Button
+                  onClick={() => setShowCreateModal(true)}
+                  color="green"
+                  text="Criar minha primeira lista"
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Modal de Criar Lista */}
+      <CreateListModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={handleCreateList}
+      />
     </div>
   )
 }
