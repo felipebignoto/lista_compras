@@ -1,154 +1,166 @@
 // src/app/lists/[id]/page.tsx
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { listService } from '@/firebase/lists'
-import { listInviteService } from '@/firebase/listInvites'
-import { userService } from '@/firebase/users'
-import { ShoppingList, User } from '@/types'
-import { ArrowLeft, Users, Trash2, UserPlus, Edit2, Check, X } from 'lucide-react'
-import Link from 'next/link'
-import AuthButton from '@/components/authButton'
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { listService } from "@/firebase/lists";
+import { listInviteService } from "@/firebase/listInvites";
+import { userService } from "@/firebase/users";
+import { ShoppingList, User } from "@/types";
+import {
+  ArrowLeft,
+  Users,
+  Trash2,
+  UserPlus,
+  Edit2,
+  Check,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import AuthButton from "@/components/authButton";
 
 export default function ListManagementPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
-  const listId = params.id as string
+  const params = useParams();
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const listId = params.id as string;
 
-  const [list, setList] = useState<ShoppingList | null>(null)
-  const [members, setMembers] = useState<Record<string, User>>({})
-  const [loading, setLoading] = useState(true)
-  const [isOwner, setIsOwner] = useState(false)
-  
+  const [list, setList] = useState<ShoppingList | null>(null);
+  const [members, setMembers] = useState<Record<string, User>>({});
+  const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+
   // Form de adicionar membro
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [memberEmail, setMemberEmail] = useState('')
-  const [memberRole, setMemberRole] = useState<'editor' | 'viewer'>('editor')
-  const [addLoading, setAddLoading] = useState(false)
-  const [addError, setAddError] = useState<string | null>(null)
-  const [addSuccess, setAddSuccess] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [memberEmail, setMemberEmail] = useState("");
+  const [memberRole, setMemberRole] = useState<"editor" | "viewer">("editor");
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState(false);
 
   // Edição de nome
-  const [isEditingName, setIsEditingName] = useState(false)
-  const [newListName, setNewListName] = useState('')
-  const [editNameLoading, setEditNameLoading] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newListName, setNewListName] = useState("");
+  const [editNameLoading, setEditNameLoading] = useState(false);
 
   useEffect(() => {
     if (user && listId) {
-      loadData()
+      loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, listId])
+  }, [user, listId]);
 
   async function loadData() {
-    if (!user || !listId) return
+    if (!user || !listId) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       // Carregar lista
-      const listData = await listService.getListById(listId)
+      const listData = await listService.getListById(listId);
       if (!listData) {
-        router.push('/')
-        return
+        router.push("/");
+        return;
       }
 
       // Verificar se usuário tem acesso
       if (!listData.members[user.uid]) {
-        router.push('/')
-        return
+        router.push("/");
+        return;
       }
 
-      setList(listData)
-      setIsOwner(listData.ownerId === user.uid)
+      setList(listData);
+      setIsOwner(listData.ownerId === user.uid);
 
       // Carregar membros
-      const memberIds = Object.keys(listData.members)
-      const membersData: Record<string, User> = {}
-      
+      const memberIds = Object.keys(listData.members);
+      const membersData: Record<string, User> = {};
+
       for (const uid of memberIds) {
-        const userData = await userService.getUserById(uid)
+        const userData = await userService.getUserById(uid);
         if (userData) {
-          membersData[uid] = userData
+          membersData[uid] = userData;
         }
       }
-      setMembers(membersData)
+      setMembers(membersData);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error)
+      console.error("Erro ao carregar dados:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleAddMember(e: React.FormEvent) {
-    e.preventDefault()
-    if (!user || !list) return
+    e.preventDefault();
+    if (!user || !list) return;
 
-    setAddLoading(true)
-    setAddError(null)
-    setAddSuccess(false)
+    setAddLoading(true);
+    setAddError(null);
+    setAddSuccess(false);
 
     try {
       await listInviteService.addUserToList(
         list.id!,
         memberEmail.trim().toLowerCase(),
         memberRole,
-        user.uid
-      )
+        user.uid,
+      );
 
-      setAddSuccess(true)
-      setMemberEmail('')
-      setMemberRole('editor')
-      loadData() // Recarregar membros
-      
+      setAddSuccess(true);
+      setMemberEmail("");
+      setMemberRole("editor");
+      loadData(); // Recarregar membros
+
       setTimeout(() => {
-        setShowAddForm(false)
-        setAddSuccess(false)
-      }, 2000)
+        setShowAddForm(false);
+        setAddSuccess(false);
+      }, 2000);
     } catch (error) {
-      setAddError(error instanceof Error ? error.message : 'Erro ao adicionar membro')
+      setAddError(
+        error instanceof Error ? error.message : "Erro ao adicionar membro",
+      );
     } finally {
-      setAddLoading(false)
+      setAddLoading(false);
     }
   }
 
   async function handleRemoveMember(userId: string) {
-    if (!user || !list) return
-    if (!confirm('Tem certeza que deseja remover este membro?')) return
+    if (!user || !list) return;
+    if (!confirm("Tem certeza que deseja remover este membro?")) return;
 
     try {
-      await listService.removeMember(list.id!, user.uid, userId)
-      loadData()
+      await listService.removeMember(list.id!, user.uid, userId);
+      loadData();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Erro ao remover membro')
+      alert(error instanceof Error ? error.message : "Erro ao remover membro");
     }
   }
 
   async function handleEditName() {
-    if (!user || !list || !newListName.trim()) return
+    if (!user || !list || !newListName.trim()) return;
 
-    setEditNameLoading(true)
+    setEditNameLoading(true);
     try {
-      await listService.updateList(list.id!, user.uid, { name: newListName.trim() })
-      setIsEditingName(false)
-      loadData()
+      await listService.updateList(list.id!, user.uid, {
+        name: newListName.trim(),
+      });
+      setIsEditingName(false);
+      loadData();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Erro ao editar nome')
+      alert(error instanceof Error ? error.message : "Erro ao editar nome");
     } finally {
-      setEditNameLoading(false)
+      setEditNameLoading(false);
     }
   }
 
   function startEditName() {
-    setNewListName(list?.name || '')
-    setIsEditingName(true)
+    setNewListName(list?.name || "");
+    setIsEditingName(true);
   }
 
   function cancelEditName() {
-    setIsEditingName(false)
-    setNewListName('')
+    setIsEditingName(false);
+    setNewListName("");
   }
 
   if (authLoading || loading) {
@@ -156,7 +168,7 @@ export default function ListManagementPage() {
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-600">Carregando...</p>
       </div>
-    )
+    );
   }
 
   if (!list) {
@@ -164,7 +176,7 @@ export default function ListManagementPage() {
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-600">Lista não encontrada</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -207,8 +219,11 @@ export default function ListManagementPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
-                  {(isOwner || list.members[user?.uid || '']?.role === 'editor') && (
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {list.name}
+                  </h1>
+                  {(isOwner ||
+                    list.members[user?.uid || ""]?.role === "editor") && (
                     <button
                       onClick={startEditName}
                       className="text-gray-400 hover:text-gray-600"
@@ -246,12 +261,18 @@ export default function ListManagementPage() {
 
           {/* Form de adicionar membro */}
           {showAddForm && (
-            <form onSubmit={handleAddMember} className="mb-6 p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-medium text-gray-900 mb-3">Adicionar membro</h3>
+            <form
+              onSubmit={handleAddMember}
+              className="mb-6 p-4 bg-blue-50 rounded-lg"
+            >
+              <h3 className="font-medium text-gray-900 mb-3">
+                Adicionar membro
+              </h3>
               <p className="text-sm text-gray-600 mb-4">
-                Digite o email de um usuário que já tenha feito login no sistema.
+                Digite o email de um usuário que já tenha feito login no
+                sistema.
               </p>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -274,12 +295,18 @@ export default function ListManagementPage() {
                   </label>
                   <select
                     value={memberRole}
-                    onChange={(e) => setMemberRole(e.target.value as 'editor' | 'viewer')}
+                    onChange={(e) =>
+                      setMemberRole(e.target.value as "editor" | "viewer")
+                    }
                     disabled={addLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="editor">Editor (pode adicionar e editar)</option>
-                    <option value="viewer">Visualizador (apenas visualizar)</option>
+                    <option value="editor">
+                      Editor (pode adicionar e editar)
+                    </option>
+                    <option value="viewer">
+                      Visualizador (apenas visualizar)
+                    </option>
                   </select>
                 </div>
 
@@ -291,7 +318,9 @@ export default function ListManagementPage() {
 
                 {addSuccess && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-sm text-green-600">Membro adicionado com sucesso!</p>
+                    <p className="text-sm text-green-600">
+                      Membro adicionado com sucesso!
+                    </p>
                   </div>
                 )}
 
@@ -299,9 +328,9 @@ export default function ListManagementPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowAddForm(false)
-                      setAddError(null)
-                      setMemberEmail('')
+                      setShowAddForm(false);
+                      setAddError(null);
+                      setMemberEmail("");
                     }}
                     disabled={addLoading}
                     className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -313,7 +342,7 @@ export default function ListManagementPage() {
                     disabled={addLoading}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    {addLoading ? 'Adicionando...' : 'Adicionar'}
+                    {addLoading ? "Adicionando..." : "Adicionar"}
                   </button>
                 </div>
               </div>
@@ -323,7 +352,7 @@ export default function ListManagementPage() {
           {/* Lista de membros */}
           <div className="space-y-2">
             {Object.entries(list.members).map(([uid, member]) => {
-              const userData = members[uid]
+              const userData = members[uid];
               return (
                 <div
                   key={uid}
@@ -344,7 +373,7 @@ export default function ListManagementPage() {
                     )}
                     <div>
                       <p className="font-medium text-gray-900">
-                        {userData?.name || userData?.email || 'Usuário'}
+                        {userData?.name || userData?.email || "Usuário"}
                         {list.ownerId === uid && (
                           <span className="ml-2 text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
                             Dono
@@ -356,13 +385,20 @@ export default function ListManagementPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`text-sm px-3 py-1 rounded-full ${
-                      member.role === 'owner' ? 'bg-blue-100 text-blue-800' :
-                      member.role === 'editor' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {member.role === 'owner' ? 'Dono' :
-                       member.role === 'editor' ? 'Editor' : 'Visualizador'}
+                    <span
+                      className={`text-sm px-3 py-1 rounded-full ${
+                        member.role === "owner"
+                          ? "bg-blue-100 text-blue-800"
+                          : member.role === "editor"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {member.role === "owner"
+                        ? "Dono"
+                        : member.role === "editor"
+                          ? "Editor"
+                          : "Visualizador"}
                     </span>
 
                     {isOwner && list.ownerId !== uid && (
@@ -375,11 +411,11 @@ export default function ListManagementPage() {
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

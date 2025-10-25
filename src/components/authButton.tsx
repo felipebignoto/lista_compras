@@ -1,20 +1,26 @@
 // src/components/authButton.tsx
-'use client'
+"use client";
 
-import { useAuth } from '@/contexts/AuthContext'
-import Button from './button'
-import { LogIn, LogOut, Shield, User as UserIcon, Settings } from 'lucide-react'
-import Link from 'next/link'
+import { useAuth } from "@/contexts/AuthContext";
+import Button from "./button";
+import {
+  LogIn,
+  LogOut,
+  Shield,
+  User as UserIcon,
+  Settings,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function AuthButton() {
-  const { user, loading, signInWithGoogle, signOut, isAdmin } = useAuth()
+  const { user, loading, signInWithGoogle, signOut, isAdmin } = useAuth();
 
   if (loading) {
     return (
       <div className="flex items-center gap-2 px-4 py-2">
         <span className="text-sm text-gray-500">Carregando...</span>
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -27,7 +33,7 @@ export default function AuthButton() {
         <LogIn className="h-4 w-4" />
         <span>Entrar com Google</span>
       </Button>
-    )
+    );
   }
 
   return (
@@ -44,11 +50,7 @@ export default function AuthButton() {
       <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200">
         {user.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={user.image}
-            alt="Avatar"
-            className="h-8 w-8 rounded-full"
-          />
+          <img src={user.image} alt="Avatar" className="h-8 w-8 rounded-full" />
         ) : (
           <UserIcon className="h-8 w-8 text-gray-400" />
         )}
@@ -73,5 +75,5 @@ export default function AuthButton() {
         <span className="hidden sm:inline">Sair</span>
       </Button>
     </div>
-  )
+  );
 }

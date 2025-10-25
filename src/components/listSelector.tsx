@@ -1,17 +1,16 @@
 // src/components/listSelector.tsx
-'use client'
+"use client";
 
-import { ShoppingList } from '@/types'
-import { ChevronDown, Plus, Settings } from 'lucide-react'
-import { useState } from 'react'
-import Link from 'next/link'
+import { ShoppingList } from "@/types";
+import { ChevronDown, Plus } from "lucide-react";
+import { useState } from "react";
 
 interface ListSelectorProps {
-  lists: ShoppingList[]
-  selectedList: ShoppingList | null
-  onSelectList: (list: ShoppingList) => void
-  onCreateNew: () => void
-  loading?: boolean
+  lists: ShoppingList[];
+  selectedList: ShoppingList | null;
+  onSelectList: (list: ShoppingList) => void;
+  onCreateNew: () => void;
+  loading?: boolean;
 }
 
 export default function ListSelector({
@@ -21,7 +20,7 @@ export default function ListSelector({
   onCreateNew,
   loading = false,
 }: ListSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   if (loading) {
     return (
@@ -30,7 +29,7 @@ export default function ListSelector({
           <span className="text-sm text-gray-500">Carregando listas...</span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -42,7 +41,7 @@ export default function ListSelector({
       >
         <div className="flex flex-col items-start">
           <span className="text-sm font-medium text-gray-900">
-            {selectedList ? selectedList.name : 'Selecione uma lista'}
+            {selectedList ? selectedList.name : "Selecione uma lista"}
           </span>
           {selectedList && (
             <span className="text-xs text-gray-500">
@@ -52,7 +51,7 @@ export default function ListSelector({
         </div>
         <ChevronDown
           className={`h-5 w-5 text-gray-400 transition-transform ${
-            isOpen ? 'rotate-180' : ''
+            isOpen ? "rotate-180" : ""
           }`}
         />
       </button>
@@ -71,8 +70,8 @@ export default function ListSelector({
             {/* Botão criar nova lista */}
             <button
               onClick={() => {
-                setIsOpen(false)
-                onCreateNew()
+                setIsOpen(false);
+                onCreateNew();
               }}
               className="w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200"
             >
@@ -93,25 +92,25 @@ export default function ListSelector({
                   <button
                     key={list.id}
                     onClick={() => {
-                      onSelectList(list)
-                      setIsOpen(false)
+                      onSelectList(list);
+                      setIsOpen(false);
                     }}
                     className={`w-full flex flex-col items-start px-4 py-2 hover:bg-gray-50 transition-colors ${
-                      selectedList?.id === list.id ? 'bg-blue-50' : ''
+                      selectedList?.id === list.id ? "bg-blue-50" : ""
                     }`}
                   >
                     <span
                       className={`text-sm font-medium ${
                         selectedList?.id === list.id
-                          ? 'text-blue-600'
-                          : 'text-gray-900'
+                          ? "text-blue-600"
+                          : "text-gray-900"
                       }`}
                     >
                       {list.name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {Object.keys(list.members).length} membro(s) •{' '}
-                      {new Date(list.createdAt).toLocaleDateString('pt-BR')}
+                      {Object.keys(list.members).length} membro(s) •{" "}
+                      {new Date(list.createdAt).toLocaleDateString("pt-BR")}
                     </span>
                   </button>
                 ))}
@@ -121,5 +120,5 @@ export default function ListSelector({
         </>
       )}
     </div>
-  )
+  );
 }

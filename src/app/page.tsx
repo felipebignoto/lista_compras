@@ -1,138 +1,141 @@
-'use client'
+"use client";
 
-import Button from '@/components/button'
-import Form from '@/components/form'
-import Table from '@/components/table'
-import Title from '@/components/title'
-import AuthButton from '@/components/authButton'
-import ListSelector from '@/components/listSelector'
-import CreateListModal from '@/components/createListModal'
-import Item from '@/core/item'
-import ItemRepo from '@/core/itemRepo'
-import ColecaoItem from '@/firebase/db'
-import { listService } from '@/firebase/lists'
-import UseTableForm from '@/hooks/useTableForm'
-import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useState, useCallback } from 'react'
-import { ShoppingList } from '@/types'
-import { List as ListIcon, Settings } from 'lucide-react'
-import Link from 'next/link'
+import Button from "@/components/button";
+import Form from "@/components/form";
+import Table from "@/components/table";
+import Title from "@/components/title";
+import AuthButton from "@/components/authButton";
+import ListSelector from "@/components/listSelector";
+import CreateListModal from "@/components/createListModal";
+import Item from "@/core/item";
+import ItemRepo from "@/core/itemRepo";
+import ColecaoItem from "@/firebase/db";
+import { listService } from "@/firebase/lists";
+import UseTableForm from "@/hooks/useTableForm";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { ShoppingList } from "@/types";
+import { List as ListIcon, Settings } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth()
-  const [item, setItem] = useState<Item>(new Item(''))
-  const [itens, setItens] = useState<Item[]>()
-  const { exibirFormulario, exibirTabela, tabelaVisivel } = UseTableForm()
-  const repo: ItemRepo = new ColecaoItem()
+  const { user, loading: authLoading } = useAuth();
+  const [item, setItem] = useState<Item>(new Item(""));
+  const [itens, setItens] = useState<Item[]>();
+  const { exibirFormulario, exibirTabela, tabelaVisivel } = UseTableForm();
+  const repo: ItemRepo = useMemo(() => new ColecaoItem(), []);
 
   // Estados de listas
-  const [lists, setLists] = useState<ShoppingList[]>([])
-  const [selectedList, setSelectedList] = useState<ShoppingList | null>(null)
-  const [loadingLists, setLoadingLists] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [canWrite, setCanWrite] = useState(false)
+  const [lists, setLists] = useState<ShoppingList[]>([]);
+  const [selectedList, setSelectedList] = useState<ShoppingList | null>(null);
+  const [loadingLists, setLoadingLists] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [canWrite, setCanWrite] = useState(false);
 
   // Função para obter todos os itens (com useCallback)
   const obterTodos = useCallback(() => {
-    if (!selectedList?.id) return
-    
+    if (!selectedList?.id) return;
+
     repo.obterTodos(selectedList.id).then((itens) => {
-      setItens(itens)
-    })
-  }, [selectedList?.id, repo])
+      setItens(itens);
+    });
+  }, [selectedList?.id, repo]);
 
   // Verificar permissão de escrita (com useCallback)
   const checkWritePermission = useCallback(async () => {
     if (!selectedList || !user) {
-      setCanWrite(false)
-      return
+      setCanWrite(false);
+      return;
     }
-    
-    const hasPermission = await listService.canWrite(selectedList.id!, user.uid)
-    setCanWrite(hasPermission)
-  }, [selectedList, user])
+
+    const hasPermission = await listService.canWrite(
+      selectedList.id!,
+      user.uid,
+    );
+    setCanWrite(hasPermission);
+  }, [selectedList, user]);
 
   // Carregar listas do usuário (com useCallback)
   const loadUserLists = useCallback(async () => {
-    if (!user) return
-    
-    setLoadingLists(true)
+    if (!user) return;
+
+    setLoadingLists(true);
     try {
-      const userLists = await listService.getListsByUser(user.uid)
-      setLists(userLists)
-      
+      const userLists = await listService.getListsByUser(user.uid);
+      setLists(userLists);
+
       // Se não tem lista selecionada, selecionar a primeira
       if (userLists.length > 0 && !selectedList) {
-        setSelectedList(userLists[0])
+        setSelectedList(userLists[0]);
       }
     } catch (error) {
-      console.error('Erro ao carregar listas:', error)
+      console.error("Erro ao carregar listas:", error);
     } finally {
-      setLoadingLists(false)
+      setLoadingLists(false);
     }
-  }, [user, selectedList])
+  }, [user, selectedList]);
 
   // Carregar listas do usuário
   useEffect(() => {
     if (user) {
-      loadUserLists()
+      loadUserLists();
     } else {
       // Limpar estado quando usuário faz logout
-      setLists([])
-      setSelectedList(null)
-      setItens(undefined)
-      setLoadingLists(false)
+      setLists([]);
+      setSelectedList(null);
+      setItens(undefined);
+      setLoadingLists(false);
     }
-  }, [user, loadUserLists])
+  }, [user, loadUserLists]);
 
   // Carregar itens quando selecionar uma lista
   useEffect(() => {
     if (selectedList && user) {
-      obterTodos()
-      checkWritePermission()
+      obterTodos();
+      checkWritePermission();
     }
-  }, [selectedList, user, obterTodos, checkWritePermission])
+  }, [selectedList, user, obterTodos, checkWritePermission]);
 
   async function handleCreateList(name: string) {
-    if (!user) return
-    
-    const newList = await listService.createList(name, user.uid)
-    setLists([newList, ...lists])
-    setSelectedList(newList)
+    if (!user) return;
+
+    const newList = await listService.createList(name, user.uid);
+    setLists([newList, ...lists]);
+    setSelectedList(newList);
   }
 
   function selectedItem(item: Item) {
-    setItem(item)
-    exibirFormulario()
+    setItem(item);
+    exibirFormulario();
   }
 
   function addItem() {
-    setItem(Item.vazio())
-    exibirFormulario()
+    setItem(Item.vazio());
+    exibirFormulario();
   }
 
   async function removeItem(itemm: Item) {
-    if (!canWrite) return
-    await repo.excluir(itemm)
-    obterTodos()
+    if (!canWrite) return;
+    await repo.excluir(itemm);
+    obterTodos();
   }
 
   async function toggleItemChecked(item: Item) {
-    if (!selectedList?.id || !user) return
-    
-    await repo.toggleChecked(item.itemId!, selectedList.id, !item.itemChecked)
-    obterTodos()
+    if (!selectedList?.id || !user) return;
+
+    await repo.toggleChecked(item.itemId!, selectedList.id, !item.itemChecked);
+    obterTodos();
   }
 
   async function saveItem(item: Item) {
     if (!selectedList?.id || !user) {
-      console.error('Lista ou usuário não definido')
-      return
+      console.error("Lista ou usuário não definido");
+      return;
     }
-    
-    await repo.salvar(item, selectedList.id, user.uid)
-    await obterTodos()
-    exibirTabela()
+
+    await repo.salvar(item, selectedList.id, user.uid);
+    await obterTodos();
+    exibirTabela();
   }
 
   if (authLoading) {
@@ -140,7 +143,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200">
         <p className="text-slate-700">Carregando...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -183,7 +186,9 @@ export default function Home() {
                     className="flex items-center gap-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors border border-indigo-200"
                   >
                     <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline font-medium">Gerenciar</span>
+                    <span className="hidden sm:inline font-medium">
+                      Gerenciar
+                    </span>
                   </Link>
                 )}
               </div>
@@ -200,11 +205,15 @@ export default function Home() {
                   <div className="flex justify-center">
                     {canWrite ? (
                       <Form
-                        title={item.itemNome === '' ? 'Novo Item' : 'Atualizar item'}
+                        title={
+                          item.itemNome === "" ? "Novo Item" : "Atualizar item"
+                        }
                         canceled={exibirTabela}
                         itemChanged={saveItem}
                         item={item}
-                        textButton={item.itemNome === '' ? 'Adicionar' : 'Salvar'}
+                        textButton={
+                          item.itemNome === "" ? "Adicionar" : "Salvar"
+                        }
                       />
                     ) : (
                       <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-6 text-center">
@@ -245,8 +254,8 @@ export default function Home() {
               <div className="bg-white rounded-2xl shadow-lg p-12 flex flex-col items-center justify-center gap-4 border border-slate-200">
                 <p className="text-slate-700 text-center text-lg">
                   {lists.length === 0
-                    ? 'Você ainda não tem listas. Crie sua primeira lista!'
-                    : 'Selecione uma lista para começar'}
+                    ? "Você ainda não tem listas. Crie sua primeira lista!"
+                    : "Selecione uma lista para começar"}
                 </p>
                 {lists.length === 0 && (
                   <Button
@@ -269,5 +278,5 @@ export default function Home() {
         />
       </div>
     </div>
-  )
+  );
 }

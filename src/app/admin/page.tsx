@@ -1,79 +1,89 @@
-'use client'
+"use client";
 
-import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { User } from '@/types'
-import { inviteService } from '@/firebase/invites'
-import AuthButton from '@/components/authButton'
-import { Users, ArrowLeft, UserCheck, Shield } from 'lucide-react'
-import Link from 'next/link'
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { inviteService } from "@/firebase/invites";
+import AuthButton from "@/components/authButton";
+import { Users, ArrowLeft, UserCheck, Shield } from "lucide-react";
+import Link from "next/link";
+
+interface UserData {
+  id?: string;
+  uid?: string;
+  email?: string;
+  role?: string;
+  active?: boolean;
+  createdAt?: number;
+}
 
 export default function AdminPage() {
-  const { user, loading: authLoading, isAdmin } = useAuth()
-  const router = useRouter()
-  const [users, setUsers] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  
+  const { user, loading: authLoading, isAdmin } = useAuth();
+  const router = useRouter();
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
+
   // Form de ativar usuário
-  const [showActivateForm, setShowActivateForm] = useState(false)
-  const [activateEmail, setActivateEmail] = useState('')
-  const [activateRole, setActivateRole] = useState<'admin' | 'user'>('user')
-  const [activateLoading, setActivateLoading] = useState(false)
-  const [activateError, setActivateError] = useState<string | null>(null)
-  const [activateSuccess, setActivateSuccess] = useState(false)
+  const [showActivateForm, setShowActivateForm] = useState(false);
+  const [activateEmail, setActivateEmail] = useState("");
+  const [activateRole, setActivateRole] = useState<"admin" | "user">("user");
+  const [activateLoading, setActivateLoading] = useState(false);
+  const [activateError, setActivateError] = useState<string | null>(null);
+  const [activateSuccess, setActivateSuccess] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
-      router.push('/')
+      router.push("/");
     }
-  }, [authLoading, isAdmin, router])
+  }, [authLoading, isAdmin, router]);
 
   useEffect(() => {
     if (user && isAdmin) {
-      loadData()
+      loadData();
     }
-  }, [user, isAdmin])
+  }, [user, isAdmin]);
 
   async function loadData() {
-    setLoading(true)
+    setLoading(true);
     try {
-      const usersData = await inviteService.listAllUsers()
-      setUsers(usersData)
+      const usersData = await inviteService.listAllUsers();
+      setUsers(usersData as UserData[]);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error)
+      console.error("Erro ao carregar dados:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleActivateUser(e: React.FormEvent) {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
 
-    setActivateLoading(true)
-    setActivateError(null)
-    setActivateSuccess(false)
+    setActivateLoading(true);
+    setActivateError(null);
+    setActivateSuccess(false);
 
     try {
       await inviteService.activateUser(
         activateEmail.trim().toLowerCase(),
-        activateRole
-      )
+        activateRole,
+      );
 
-      setActivateSuccess(true)
-      setActivateEmail('')
-      setActivateRole('user')
-      loadData() // Recarregar usuários
-      
+      setActivateSuccess(true);
+      setActivateEmail("");
+      setActivateRole("user");
+      loadData(); // Recarregar usuários
+
       setTimeout(() => {
-        setShowActivateForm(false)
-        setActivateSuccess(false)
-      }, 2000)
+        setShowActivateForm(false);
+        setActivateSuccess(false);
+      }, 2000);
     } catch (error) {
-      setActivateError(error instanceof Error ? error.message : 'Erro ao ativar usuário')
+      setActivateError(
+        error instanceof Error ? error.message : "Erro ao ativar usuário",
+      );
     } finally {
-      setActivateLoading(false)
+      setActivateLoading(false);
     }
   }
 
@@ -82,15 +92,15 @@ export default function AdminPage() {
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-600">Carregando...</p>
       </div>
-    )
+    );
   }
 
   if (!isAdmin) {
-    return null
+    return null;
   }
 
-  const activeUsers = users.filter((u: any) => u.status === 'active')
-  const pendingUsers = users.filter((u: any) => u.status === 'pending')
+  const activeUsers = users.filter((u: any) => u.status === "active");
+  const pendingUsers = users.filter((u: any) => u.status === "pending");
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -129,12 +139,16 @@ export default function AdminPage() {
 
           {/* Form de ativar usuário */}
           {showActivateForm && (
-            <form onSubmit={handleActivateUser} className="mb-6 p-4 bg-blue-50 rounded-lg">
+            <form
+              onSubmit={handleActivateUser}
+              className="mb-6 p-4 bg-blue-50 rounded-lg"
+            >
               <h3 className="font-medium text-gray-900 mb-3">Ativar usuário</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Digite o email de um usuário que já tenha feito login no sistema.
+                Digite o email de um usuário que já tenha feito login no
+                sistema.
               </p>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -157,7 +171,9 @@ export default function AdminPage() {
                   </label>
                   <select
                     value={activateRole}
-                    onChange={(e) => setActivateRole(e.target.value as 'admin' | 'user')}
+                    onChange={(e) =>
+                      setActivateRole(e.target.value as "admin" | "user")
+                    }
                     disabled={activateLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -174,7 +190,9 @@ export default function AdminPage() {
 
                 {activateSuccess && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-sm text-green-600">Usuário ativado com sucesso!</p>
+                    <p className="text-sm text-green-600">
+                      Usuário ativado com sucesso!
+                    </p>
                   </div>
                 )}
 
@@ -182,9 +200,9 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowActivateForm(false)
-                      setActivateError(null)
-                      setActivateEmail('')
+                      setShowActivateForm(false);
+                      setActivateError(null);
+                      setActivateEmail("");
                     }}
                     disabled={activateLoading}
                     className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -196,7 +214,7 @@ export default function AdminPage() {
                     disabled={activateLoading}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    {activateLoading ? 'Ativando...' : 'Ativar'}
+                    {activateLoading ? "Ativando..." : "Ativar"}
                   </button>
                 </div>
               </div>
@@ -236,22 +254,24 @@ export default function AdminPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`text-sm px-3 py-1 rounded-full ${
-                      userData.role === 'admin' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {userData.role === 'admin' ? (
+                    <span
+                      className={`text-sm px-3 py-1 rounded-full ${
+                        userData.role === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {userData.role === "admin" ? (
                         <span className="flex items-center gap-1">
                           <Shield className="h-3 w-3" />
                           Admin
                         </span>
                       ) : (
-                        'Usuário'
+                        "Usuário"
                       )}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {new Date(userData.createdAt).toLocaleDateString('pt-BR')}
+                      {new Date(userData.createdAt).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
                 </div>
@@ -288,7 +308,9 @@ export default function AdminPage() {
                         <p className="font-medium text-gray-900">
                           {userData.name || userData.email}
                         </p>
-                        <p className="text-sm text-gray-500">{userData.email}</p>
+                        <p className="text-sm text-gray-500">
+                          {userData.email}
+                        </p>
                       </div>
                     </div>
 
@@ -297,7 +319,9 @@ export default function AdminPage() {
                         Aguardando ativação
                       </span>
                       <span className="text-xs text-gray-500">
-                        {new Date(userData.createdAt).toLocaleDateString('pt-BR')}
+                        {new Date(userData.createdAt).toLocaleDateString(
+                          "pt-BR",
+                        )}
                       </span>
                     </div>
                   </div>
@@ -308,5 +332,5 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

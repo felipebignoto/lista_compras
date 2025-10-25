@@ -1,15 +1,14 @@
 // src/components/createListModal.tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Button from './button'
-import Input from './input'
-import { X } from 'lucide-react'
+import { useState } from "react";
+import Input from "./input";
+import { X } from "lucide-react";
 
 interface CreateListModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onCreate: (name: string) => Promise<void>
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: (name: string) => Promise<void>;
 }
 
 export default function CreateListModal({
@@ -17,33 +16,33 @@ export default function CreateListModal({
   onClose,
   onCreate,
 }: CreateListModalProps) {
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!name.trim()) {
-      setError('Nome da lista é obrigatório')
-      return
+      setError("Nome da lista é obrigatório");
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      await onCreate(name.trim())
-      setName('')
-      onClose()
+      await onCreate(name.trim());
+      setName("");
+      onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar lista')
+      setError(err instanceof Error ? err.message : "Erro ao criar lista");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -75,11 +74,7 @@ export default function CreateListModal({
             >
               Nome da Lista
             </label>
-            <Input
-              type="text"
-              value={name}
-              onChange={setName}
-            />
+            <Input type="text" value={name} onChange={setName} />
             <p className="text-xs text-gray-500 mt-1">
               Ex: Supermercado, Farmácia...
             </p>
@@ -106,11 +101,11 @@ export default function CreateListModal({
               disabled={loading}
               className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Criando...' : 'Criar Lista'}
+              {loading ? "Criando..." : "Criar Lista"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

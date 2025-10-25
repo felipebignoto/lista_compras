@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 interface InputProps {
-  type: string
-  value: any
-  onChange: (value: any) => void
+  type: string;
+  value: string | number;
+  onChange: (value: string) => void;
 }
 
 export default function Input(props: InputProps) {
@@ -13,5 +12,5 @@ export default function Input(props: InputProps) {
       value={props.value}
       onChange={(e) => props.onChange?.(e.target.value)}
     />
-  )
+  );
 }

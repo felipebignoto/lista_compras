@@ -1,13 +1,13 @@
 export default class Item {
-  private id: string | undefined | null
-  private nome: string
-  private quantidade?: number | undefined | null
-  private observacao?: string | undefined | null
-  private listId?: string | undefined | null
-  private createdBy?: string | undefined | null
-  private createdAt?: number | undefined | null
-  private updatedAt?: number | undefined | null
-  private checked: boolean
+  private id: string | undefined | null;
+  private nome: string;
+  private quantidade?: number | undefined | null;
+  private observacao?: string | undefined | null;
+  private listId?: string | undefined | null;
+  private createdBy?: string | undefined | null;
+  private createdAt?: number | undefined | null;
+  private updatedAt?: number | undefined | null;
+  private checked: boolean;
 
   constructor(
     nome: string,
@@ -20,54 +20,54 @@ export default class Item {
     updatedAt: number | null = null,
     checked: boolean = false,
   ) {
-    this.id = id
-    this.nome = nome
-    this.quantidade = quantidade
-    this.observacao = observacao
-    this.listId = listId
-    this.createdBy = createdBy
-    this.createdAt = createdAt
-    this.updatedAt = updatedAt
-    this.checked = checked
+    this.id = id;
+    this.nome = nome;
+    this.quantidade = quantidade;
+    this.observacao = observacao;
+    this.listId = listId;
+    this.createdBy = createdBy;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.checked = checked;
   }
 
   static vazio() {
-    return new Item('', 1, '', null, null, null, null, null, false)
+    return new Item("", 1, "", null, null, null, null, null, false);
   }
 
   get itemId() {
-    return this.id
+    return this.id;
   }
 
   get itemNome() {
-    return this.nome
+    return this.nome;
   }
 
   get itemQuantidade() {
-    return this.quantidade
+    return this.quantidade;
   }
 
   get itemObservacao() {
-    return this.observacao
+    return this.observacao;
   }
 
   get itemListId() {
-    return this.listId
+    return this.listId;
   }
 
   get itemCreatedBy() {
-    return this.createdBy
+    return this.createdBy;
   }
 
   get itemCreatedAt() {
-    return this.createdAt
+    return this.createdAt;
   }
 
   get itemUpdatedAt() {
-    return this.updatedAt
+    return this.updatedAt;
   }
 
   get itemChecked() {
-    return this.checked
+    return this.checked;
   }
 }
