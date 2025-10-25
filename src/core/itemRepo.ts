@@ -1,7 +1,12 @@
-import Item from './item'
+import Item from "./item";
 
 export default interface ItemRepo {
-  salvar(item: Item): Promise<Item | undefined>
-  excluir(item: Item): Promise<void>
-  obterTodos(): Promise<Item[]>
+  salvar(item: Item, listId: string, userId: string): Promise<Item | undefined>;
+  excluir(item: Item): Promise<void>;
+  obterTodos(listId: string): Promise<Item[]>;
+  toggleChecked(
+    itemId: string,
+    listId: string,
+    checked: boolean,
+  ): Promise<void>;
 }

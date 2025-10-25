@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+
 interface ButtonProps {
-  text?: string
-  color: 'green' | 'blue' | 'red'
-  onClick?: () => void
-  children?: any
-  isIcon?: boolean
-  className?: string
+  text?: string;
+  color: "green" | "blue" | "red";
+  onClick?: () => void;
+  children?: React.ReactNode;
+  isIcon?: boolean;
+  className?: string;
 }
 
 export default function Button(props: ButtonProps) {
-  const isIcon = props.isIcon ?? false
+  const isIcon = props.isIcon ?? false;
 
   return (
     <button
@@ -19,5 +20,5 @@ export default function Button(props: ButtonProps) {
       {props.text}
       {props.children}
     </button>
-  )
+  );
 }

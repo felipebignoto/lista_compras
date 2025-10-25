@@ -1,10 +1,10 @@
-import { ShoppingBasket } from 'lucide-react'
+import { ShoppingBasket } from "lucide-react";
 
 interface TitleProps {
-  title: string
-  subtitle?: string
-  TextButton?: string
-  icon?: boolean
+  title: string;
+  subtitle?: string;
+  TextButton?: string;
+  icon?: boolean;
 }
 
 export default function Title(props: TitleProps) {
@@ -14,5 +14,5 @@ export default function Title(props: TitleProps) {
       <h1 className="text-3xl underline ">{props.title}</h1>
       {props.subtitle ? <h2 className="text-xl">{props.subtitle}</h2> : false}
     </div>
-  )
+  );
 }
