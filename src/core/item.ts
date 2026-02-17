@@ -1,7 +1,6 @@
 export default class Item {
   private id: string | undefined | null;
   private nome: string;
-  private quantidade?: number | undefined | null;
   private observacao?: string | undefined | null;
   private listId?: string | undefined | null;
   private createdBy?: string | undefined | null;
@@ -11,7 +10,6 @@ export default class Item {
 
   constructor(
     nome: string,
-    quantidade: number = 1,
     observacao: string | null = null,
     id: string | null = null,
     listId: string | null = null,
@@ -22,7 +20,6 @@ export default class Item {
   ) {
     this.id = id;
     this.nome = nome;
-    this.quantidade = quantidade;
     this.observacao = observacao;
     this.listId = listId;
     this.createdBy = createdBy;
@@ -32,7 +29,7 @@ export default class Item {
   }
 
   static vazio() {
-    return new Item("", 1, "", null, null, null, null, null, false);
+    return new Item("", "", null, null, null, null, null, false);
   }
 
   get itemId() {
@@ -41,10 +38,6 @@ export default class Item {
 
   get itemNome() {
     return this.nome;
-  }
-
-  get itemQuantidade() {
-    return this.quantidade;
   }
 
   get itemObservacao() {

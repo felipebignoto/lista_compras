@@ -11,6 +11,7 @@ import Item from "@/core/item";
 import ItemRepo from "@/core/itemRepo";
 import ColecaoItem from "@/firebase/db";
 import { listService } from "@/firebase/lists";
+import { userService } from "@/firebase/users";
 import UseTableForm from "@/hooks/useTableForm";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -31,6 +32,7 @@ export default function Home() {
   const [loadingLists, setLoadingLists] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [canWrite, setCanWrite] = useState(false);
+  const [favoriteListId, setFavoriteListId] = useState<string | null>(null);
 
   // Função para obter todos os itens (com useCallback)
   const obterTodos = useCallback(() => {
@@ -63,6 +65,10 @@ export default function Home() {
     try {
       const userLists = await listService.getListsByUser(user.uid);
       setLists(userLists);
+
+      // Buscar lista favorita
+      const favId = await userService.getFavoriteListId(user.uid);
+      setFavoriteListId(favId);
 
       // Se não tem lista selecionada, selecionar a primeira
       if (userLists.length > 0 && !selectedList) {
@@ -102,6 +108,42 @@ export default function Home() {
     const newList = await listService.createList(name, user.uid);
     setLists([newList, ...lists]);
     setSelectedList(newList);
+  }
+
+  async function handleToggleFavorite(listId: string, setAsFavorite: boolean) {
+    if (!user) return;
+
+    try {
+      await userService.setFavoriteList(user.uid, setAsFavorite ? listId : null);
+      setFavoriteListId(setAsFavorite ? listId : null);
+    } catch (error) {
+      console.error("Erro ao atualizar favorita:", error);
+    }
+  }
+
+  async function handleDeleteList(listId: string) {
+    if (!user) return;
+
+    try {
+      await listService.deleteList(listId, user.uid);
+
+      // Remover lista do estado
+      const updatedLists = lists.filter((l) => l.id !== listId);
+      setLists(updatedLists);
+
+      // Se era a lista selecionada, selecionar outra
+      if (selectedList?.id === listId) {
+        setSelectedList(updatedLists.length > 0 ? updatedLists[0] : null);
+      }
+
+      // Se era a favorita, limpar favorita
+      if (favoriteListId === listId) {
+        setFavoriteListId(null);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir lista:", error);
+      alert("Erro ao excluir lista: " + (error as Error).message);
+    }
   }
 
   function selectedItem(item: Item) {
@@ -148,9 +190,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200">
-      <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="max-w-5xl mx-auto p-3 sm:p-4 md:p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3 sm:gap-0">
           <Title
             title="Gerenciador de Listas"
             subtitle="Organize suas tarefas e itens"
@@ -160,35 +202,37 @@ export default function Home() {
         </div>
 
         {!user ? (
-          <div className="flex flex-col items-center justify-center mt-20 gap-4 bg-white rounded-2xl shadow-xl p-12 border border-slate-200">
-            <p className="text-slate-700 text-center text-lg">
+          <div className="flex flex-col items-center justify-center mt-10 md:mt-20 gap-4 bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-slate-200">
+            <p className="text-slate-700 text-center text-base md:text-lg">
               Faça login para gerenciar suas listas
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 md:gap-6">
             {/* Seletor de Lista */}
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-slate-200">
-              <div className="flex items-center gap-3">
-                <ListIcon className="h-5 w-5 text-indigo-600" />
-                <div className="flex-1 max-w-md">
+            <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 border border-slate-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <ListIcon className="hidden sm:block h-5 w-5 text-indigo-600" />
+                <div className="flex-1">
                   <ListSelector
                     lists={lists}
                     selectedList={selectedList}
                     onSelectList={setSelectedList}
                     onCreateNew={() => setShowCreateModal(true)}
+                    onToggleFavorite={handleToggleFavorite}
+                    onDeleteList={handleDeleteList}
+                    favoriteListId={favoriteListId}
+                    currentUserId={user?.uid}
                     loading={loadingLists}
                   />
                 </div>
                 {selectedList && (
                   <Link
                     href={`/lists/${selectedList.id}`}
-                    className="flex items-center gap-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors border border-indigo-200"
+                    className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors border border-indigo-200 min-h-11"
                   >
                     <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline font-medium">
-                      Gerenciar
-                    </span>
+                    <span className="sm:inline font-medium">Gerenciar</span>
                   </Link>
                 )}
               </div>
@@ -196,11 +240,11 @@ export default function Home() {
 
             {/* Conteúdo da Lista */}
             {loadingLists ? (
-              <div className="bg-white rounded-2xl shadow-lg p-12 flex items-center justify-center border border-slate-200">
+              <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 flex items-center justify-center border border-slate-200">
                 <p className="text-slate-600">Carregando listas...</p>
               </div>
             ) : selectedList ? (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+              <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-slate-200">
                 {!tabelaVisivel ? (
                   <div className="flex justify-center">
                     {canWrite ? (

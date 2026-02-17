@@ -2,7 +2,7 @@
 "use client";
 
 import { ShoppingList } from "@/types";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface ListSelectorProps {
@@ -10,6 +10,10 @@ interface ListSelectorProps {
   selectedList: ShoppingList | null;
   onSelectList: (list: ShoppingList) => void;
   onCreateNew: () => void;
+  onToggleFavorite?: (listId: string, isFavorite: boolean) => void;
+  onDeleteList?: (listId: string) => void;
+  favoriteListId?: string | null;
+  currentUserId?: string;
   loading?: boolean;
 }
 
@@ -18,9 +22,34 @@ export default function ListSelector({
   selectedList,
   onSelectList,
   onCreateNew,
+  onToggleFavorite,
+  onDeleteList,
+  favoriteListId,
+  currentUserId,
   loading = false,
 }: ListSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggleFavorite = (
+    e: React.MouseEvent,
+    listId: string,
+    isFavorite: boolean,
+  ) => {
+    e.stopPropagation();
+    onToggleFavorite?.(listId, !isFavorite);
+  };
+
+  const handleDeleteList = (e: React.MouseEvent, listId: string) => {
+    e.stopPropagation();
+    if (
+      confirm(
+        "⚠️ Tem certeza que deseja excluir esta lista?\n\nEsta ação não pode ser desfeita e todos os itens serão perdidos.",
+      )
+    ) {
+      onDeleteList?.(listId);
+      setIsOpen(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -88,32 +117,76 @@ export default function ListSelector({
               </div>
             ) : (
               <div className="py-1">
-                {lists.map((list) => (
-                  <button
-                    key={list.id}
-                    onClick={() => {
-                      onSelectList(list);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex flex-col items-start px-4 py-2 hover:bg-gray-50 transition-colors ${
-                      selectedList?.id === list.id ? "bg-blue-50" : ""
-                    }`}
-                  >
-                    <span
-                      className={`text-sm font-medium ${
-                        selectedList?.id === list.id
-                          ? "text-blue-600"
-                          : "text-gray-900"
+                {lists.map((list) => {
+                  const isFavorite = list.id === favoriteListId;
+                  const isOwner = list.ownerId === currentUserId;
+
+                  return (
+                    <div
+                      key={list.id}
+                      className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-50 transition-colors ${
+                        selectedList?.id === list.id ? "bg-blue-50" : ""
                       }`}
                     >
-                      {list.name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {Object.keys(list.members).length} membro(s) •{" "}
-                      {new Date(list.createdAt).toLocaleDateString("pt-BR")}
-                    </span>
-                  </button>
-                ))}
+                      {/* Botão de favorita */}
+                      <button
+                        onClick={(e) =>
+                          handleToggleFavorite(e, list.id!, isFavorite)
+                        }
+                        className="flex-shrink-0 p-1 hover:bg-gray-200 rounded transition-colors"
+                        title={
+                          isFavorite
+                            ? "Remover dos favoritos"
+                            : "Marcar como favorita"
+                        }
+                      >
+                        <Star
+                          className={`h-4 w-4 ${
+                            isFavorite
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      </button>
+
+                      {/* Nome da lista (clicável) */}
+                      <button
+                        onClick={() => {
+                          onSelectList(list);
+                          setIsOpen(false);
+                        }}
+                        className="flex-1 flex flex-col items-start text-left"
+                      >
+                        <span
+                          className={`text-sm font-medium ${
+                            selectedList?.id === list.id
+                              ? "text-blue-600"
+                              : "text-gray-900"
+                          }`}
+                        >
+                          {list.name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {Object.keys(list.members).length} membro(s) •{" "}
+                          {new Date(list.createdAt).toLocaleDateString(
+                            "pt-BR",
+                          )}
+                        </span>
+                      </button>
+
+                      {/* Botão de exclusão (apenas para owner) */}
+                      {isOwner && onDeleteList && (
+                        <button
+                          onClick={(e) => handleDeleteList(e, list.id!)}
+                          className="flex-shrink-0 p-1 hover:bg-red-100 rounded transition-colors"
+                          title="Excluir lista"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

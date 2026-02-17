@@ -1,6 +1,7 @@
 // src/firebase/lists.ts
 import firebase, { firestore } from "./config";
 import { ShoppingList, ListRole, ListMember } from "@/types";
+import { userService } from "./users";
 
 export class ListService {
   private collection = "lists";
@@ -46,6 +47,7 @@ export class ListService {
 
   /**
    * Listar todas as listas onde o usuário é membro
+   * Ordena com a lista favorita primeiro, depois por data de criação
    */
   async getListsByUser(userId: string): Promise<ShoppingList[]> {
     const db = this.getFirestore();
@@ -56,10 +58,17 @@ export class ListService {
 
     const lists = snapshot.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }) as ShoppingList)
-      .filter((list) => !!list.members[userId])
-      .sort((a, b) => b.createdAt - a.createdAt);
+      .filter((list) => !!list.members[userId]);
 
-    return lists;
+    // Buscar lista favorita do usuário
+    const favoriteListId = await userService.getFavoriteListId(userId);
+
+    // Ordenar: favorita primeiro, depois por data de criação
+    return lists.sort((a, b) => {
+      if (a.id === favoriteListId) return -1;
+      if (b.id === favoriteListId) return 1;
+      return b.createdAt - a.createdAt;
+    });
   }
 
   /**
@@ -98,22 +107,6 @@ export class ListService {
     }
 
     await db.collection(this.collection).doc(id).update(data);
-  }
-
-  /**
-   * Deletar lista (apenas owner)
-   */
-  async deleteList(id: string, userId: string): Promise<void> {
-    const db = this.getFirestore();
-
-    const list = await this.getListById(id);
-    if (!list) throw new Error("Lista não encontrada");
-
-    if (list.ownerId !== userId) {
-      throw new Error("Apenas o dono pode deletar a lista");
-    }
-
-    await db.collection(this.collection).doc(id).delete();
   }
 
   /**
@@ -253,6 +246,43 @@ export class ListService {
     if (!list) return null;
     const member = list.members[userId];
     return member ? member.role : null;
+  }
+
+  /**
+   * Excluir lista (apenas owner)
+   * Remove todos os itens da subcoleção e depois a lista
+   */
+  async deleteList(listId: string, userId: string): Promise<void> {
+    const db = this.getFirestore();
+
+    // Verificar se usuário é owner
+    const list = await this.getListById(listId);
+    if (!list) {
+      throw new Error("Lista não encontrada");
+    }
+
+    if (list.ownerId !== userId) {
+      throw new Error("Apenas o dono pode excluir a lista");
+    }
+
+    // Excluir todos os itens da subcoleção
+    const itemsSnapshot = await db
+      .collection(this.collection)
+      .doc(listId)
+      .collection("itens")
+      .get();
+
+    // Batch delete para melhor performance
+    const batch = db.batch();
+    itemsSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    // Excluir o documento da lista
+    batch.delete(db.collection(this.collection).doc(listId));
+
+    // Executar todas as exclusões
+    await batch.commit();
   }
 }
 

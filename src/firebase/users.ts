@@ -98,6 +98,28 @@ export class UserService {
     return user?.role === "admin";
   }
 
+  /**
+   * Define a lista favorita do usuário
+   */
+  async setFavoriteList(
+    uid: string,
+    listId: string | null,
+  ): Promise<void> {
+    const db = this.getFirestore();
+    await db
+      .collection(this.collection)
+      .doc(uid)
+      .update({ favoriteListId: listId });
+  }
+
+  /**
+   * Obtém o ID da lista favorita do usuário
+   */
+  async getFavoriteListId(uid: string): Promise<string | null> {
+    const user = await this.getUserById(uid);
+    return user?.favoriteListId || null;
+  }
+
   async isActiveUser(uid: string): Promise<boolean> {
     const user = await this.getUserById(uid);
     return user?.status === "active";

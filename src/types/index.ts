@@ -14,6 +14,7 @@ export interface User {
   status: UserStatus;
   createdAt: number;
   invitedBy?: string | null;
+  favoriteListId?: string | null;
 }
 
 export interface AccountInvite {
@@ -43,7 +44,6 @@ export interface ShoppingList {
 export interface ListItem {
   id?: string;
   nome: string;
-  quantidade: number;
   observacao?: string | null;
   createdBy: string;
   createdAt: number;

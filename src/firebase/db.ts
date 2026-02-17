@@ -28,7 +28,6 @@ export default class ColecaoItem implements ItemRepo {
       // Atualizar item existente
       await this.getItemsCollection(listId).doc(item.itemId).update({
         nome: item.itemNome,
-        quantidade: item.itemQuantidade,
         observacao: item.itemObservacao,
         checked: item.itemChecked,
         updatedAt: now,
@@ -43,7 +42,6 @@ export default class ColecaoItem implements ItemRepo {
         .collection("itens")
         .add({
           nome: item.itemNome,
-          quantidade: item.itemQuantidade,
           observacao: item.itemObservacao,
           checked: false,
           createdBy: userId,
@@ -57,7 +55,6 @@ export default class ColecaoItem implements ItemRepo {
 
       return new Item(
         dados.nome,
-        dados.quantidade,
         dados.observacao,
         doc.id,
         listId,
@@ -80,11 +77,19 @@ export default class ColecaoItem implements ItemRepo {
   async obterTodos(listId: string): Promise<Item[]> {
     if (typeof window === "undefined") return [];
 
-    const query = await this.getItemsCollection(listId)
-      .orderBy("createdAt", "desc")
-      .get();
+    const query = await this.getItemsCollection(listId).get();
 
-    return query.docs.map((doc) => doc.data()) ?? [];
+    const items = query.docs.map((doc) => doc.data()) ?? [];
+
+    // Ordenar: itens não marcados primeiro, depois por data de criação
+    return items.sort((a, b) => {
+      // Primeiro critério: checked (false antes de true)
+      if (a.itemChecked !== b.itemChecked) {
+        return a.itemChecked ? 1 : -1;
+      }
+      // Segundo critério: data de criação (mais recente primeiro)
+      return (b.itemCreatedAt ?? 0) - (a.itemCreatedAt ?? 0);
+    });
   }
 
   async toggleChecked(
@@ -100,7 +105,6 @@ export default class ColecaoItem implements ItemRepo {
     toFirestore(item: Item) {
       return {
         nome: item.itemNome,
-        quantidade: item.itemQuantidade,
         observacao: item.itemObservacao,
         checked: item.itemChecked,
         createdBy: item.itemCreatedBy,
@@ -115,7 +119,6 @@ export default class ColecaoItem implements ItemRepo {
       const dados = snapshot?.data(options);
       return new Item(
         dados.nome,
-        dados.quantidade,
         dados.observacao,
         snapshot?.id,
         snapshot.ref.parent.parent?.id || "", // listId from parent
