@@ -54,8 +54,8 @@ export default function ListSelector({
   if (loading) {
     return (
       <div className="relative">
-        <div className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
-          <span className="text-sm text-gray-500">Carregando listas...</span>
+        <div className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-50 dark:bg-slate-700">
+          <span className="text-sm text-gray-500 dark:text-gray-400">Carregando listas...</span>
         </div>
       </div>
     );
@@ -66,20 +66,20 @@ export default function ListSelector({
       {/* Botão do dropdown */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
       >
         <div className="flex flex-col items-start">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {selectedList ? selectedList.name : "Selecione uma lista"}
           </span>
           {selectedList && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               {Object.keys(selectedList.members).length} membro(s)
             </span>
           )}
         </div>
         <ChevronDown
-          className={`h-5 w-5 text-gray-400 transition-transform ${
+          className={`h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -95,24 +95,24 @@ export default function ListSelector({
           />
 
           {/* Dropdown */}
-          <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+          <div className="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-64 overflow-y-auto">
             {/* Botão criar nova lista */}
             <button
               onClick={() => {
                 setIsOpen(false);
                 onCreateNew();
               }}
-              className="w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-200"
+              className="w-full flex items-center gap-2 px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-gray-200 dark:border-slate-600"
             >
-              <Plus className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium text-blue-600">
+              <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                 Criar nova lista
               </span>
             </button>
 
             {/* Lista de listas */}
             {lists.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+              <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
                 Você ainda não tem listas
               </div>
             ) : (
@@ -124,8 +124,8 @@ export default function ListSelector({
                   return (
                     <div
                       key={list.id}
-                      className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-50 transition-colors ${
-                        selectedList?.id === list.id ? "bg-blue-50" : ""
+                      className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors ${
+                        selectedList?.id === list.id ? "bg-blue-50 dark:bg-slate-700" : ""
                       }`}
                     >
                       {/* Botão de favorita */}
@@ -133,7 +133,7 @@ export default function ListSelector({
                         onClick={(e) =>
                           handleToggleFavorite(e, list.id!, isFavorite)
                         }
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 rounded transition-colors"
+                        className="flex-shrink-0 p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded transition-colors"
                         title={
                           isFavorite
                             ? "Remover dos favoritos"
@@ -144,7 +144,7 @@ export default function ListSelector({
                           className={`h-4 w-4 ${
                             isFavorite
                               ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-400"
+                              : "text-gray-400 dark:text-gray-500"
                           }`}
                         />
                       </button>
@@ -160,13 +160,13 @@ export default function ListSelector({
                         <span
                           className={`text-sm font-medium ${
                             selectedList?.id === list.id
-                              ? "text-blue-600"
-                              : "text-gray-900"
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "text-gray-900 dark:text-gray-100"
                           }`}
                         >
                           {list.name}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {Object.keys(list.members).length} membro(s) •{" "}
                           {new Date(list.createdAt).toLocaleDateString(
                             "pt-BR",
@@ -178,10 +178,10 @@ export default function ListSelector({
                       {isOwner && onDeleteList && (
                         <button
                           onClick={(e) => handleDeleteList(e, list.id!)}
-                          className="flex-shrink-0 p-1 hover:bg-red-100 rounded transition-colors"
+                          className="flex-shrink-0 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
                           title="Excluir lista"
                         >
-                          <Trash2 className="h-4 w-4 text-red-600" />
+                          <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                         </button>
                       )}
                     </div>

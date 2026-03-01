@@ -17,17 +17,17 @@ export default function Form(props: FormProps) {
   const [observacao, setobservacao] = useState(props.item.itemObservacao ?? "");
   const id = props.item?.itemId;
   return (
-    <div className="w-full max-w-2xl p-4 md:p-6 bg-slate-50 border border-slate-300 rounded-2xl shadow-xl">
+    <div className="w-full max-w-2xl p-4 md:p-6 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-2xl shadow-xl">
       <Title title={props.title}></Title>
       <div className="flex flex-col gap-4 md:gap-5 mt-4 md:mt-6">
         <div className="flex flex-col gap-2">
-          <label className="text-slate-700 font-medium text-sm md:text-base">
+          <label className="text-slate-700 dark:text-slate-300 font-medium text-sm md:text-base">
             Nome
           </label>
           <Input onChange={setNome} value={nome} type="text"></Input>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-slate-700 font-medium text-sm md:text-base">
+          <label className="text-slate-700 dark:text-slate-300 font-medium text-sm md:text-base">
             Observação
           </label>
           <Input

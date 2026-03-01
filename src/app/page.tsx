@@ -7,6 +7,7 @@ import Title from "@/components/title";
 import AuthButton from "@/components/authButton";
 import ListSelector from "@/components/listSelector";
 import CreateListModal from "@/components/createListModal";
+import ThemeToggle from "@/components/themeToggle";
 import Item from "@/core/item";
 import ItemRepo from "@/core/itemRepo";
 import ColecaoItem from "@/firebase/db";
@@ -182,14 +183,14 @@ export default function Home() {
 
   if (authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200">
-        <p className="text-slate-700">Carregando...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900">
+        <p className="text-slate-700 dark:text-slate-300">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-100 to-purple-200 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900">
       <div className="max-w-5xl mx-auto p-3 sm:p-4 md:p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3 sm:gap-0">
@@ -198,21 +199,24 @@ export default function Home() {
             subtitle="Organize suas tarefas e itens"
             icon
           />
-          <AuthButton />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <AuthButton />
+          </div>
         </div>
 
         {!user ? (
-          <div className="flex flex-col items-center justify-center mt-10 md:mt-20 gap-4 bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-slate-200">
-            <p className="text-slate-700 text-center text-base md:text-lg">
+          <div className="flex flex-col items-center justify-center mt-10 md:mt-20 gap-4 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
+            <p className="text-slate-700 dark:text-slate-300 text-center text-base md:text-lg">
               Faça login para gerenciar suas listas
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-4 md:gap-6">
             {/* Seletor de Lista */}
-            <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 border border-slate-200">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-3 md:p-4 border border-slate-200 dark:border-slate-700">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <ListIcon className="hidden sm:block h-5 w-5 text-indigo-600" />
+                <ListIcon className="hidden sm:block h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 <div className="flex-1">
                   <ListSelector
                     lists={lists}
@@ -229,7 +233,7 @@ export default function Home() {
                 {selectedList && (
                   <Link
                     href={`/lists/${selectedList.id}`}
-                    className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors border border-indigo-200 min-h-11"
+                    className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-200 dark:border-indigo-700 min-h-11"
                   >
                     <Settings className="h-4 w-4" />
                     <span className="sm:inline font-medium">Gerenciar</span>
@@ -240,11 +244,11 @@ export default function Home() {
 
             {/* Conteúdo da Lista */}
             {loadingLists ? (
-              <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 flex items-center justify-center border border-slate-200">
-                <p className="text-slate-600">Carregando listas...</p>
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 md:p-12 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-600 dark:text-slate-400">Carregando listas...</p>
               </div>
             ) : selectedList ? (
-              <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-slate-200">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-4 md:p-6 border border-slate-200 dark:border-slate-700">
                 {!tabelaVisivel ? (
                   <div className="flex justify-center">
                     {canWrite ? (
@@ -260,13 +264,13 @@ export default function Home() {
                         }
                       />
                     ) : (
-                      <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-6 text-center">
-                        <p className="text-yellow-800 mb-3">
+                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-xl p-6 text-center">
+                        <p className="text-yellow-800 dark:text-yellow-300 mb-3">
                           Você não tem permissão para editar itens nesta lista
                         </p>
                         <button
                           onClick={exibirTabela}
-                          className="text-sm text-yellow-700 hover:text-yellow-900 font-medium"
+                          className="text-sm text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 font-medium"
                         >
                           Voltar para lista
                         </button>
@@ -295,8 +299,8 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-lg p-12 flex flex-col items-center justify-center gap-4 border border-slate-200">
-                <p className="text-slate-700 text-center text-lg">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 flex flex-col items-center justify-center gap-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-700 dark:text-slate-300 text-center text-lg">
                   {lists.length === 0
                     ? "Você ainda não tem listas. Crie sua primeira lista!"
                     : "Selecione uma lista para começar"}
