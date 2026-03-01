@@ -13,6 +13,10 @@ body {
   background: rgb(229, 231, 235);
 }
 
+.dark body {
+  background: rgb(15, 23, 42);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -89,8 +89,8 @@ export default function AdminPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen dark:bg-slate-900">
+        <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
       </div>
     );
   }
@@ -103,28 +103,28 @@ export default function AdminPage() {
   const pendingUsers = users.filter((u: any) => u.status === "pending");
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-slate-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="p-2 hover:bg-white rounded-lg transition-colors"
+              className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors text-gray-700 dark:text-gray-300"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="text-2xl font-bold">Painel Administrativo</h1>
+            <h1 className="text-2xl font-bold dark:text-gray-100">Painel Administrativo</h1>
           </div>
           <AuthButton />
         </div>
 
         {/* Usuários */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Usuários ({users.length})
               </h2>
             </div>
@@ -141,17 +141,17 @@ export default function AdminPage() {
           {showActivateForm && (
             <form
               onSubmit={handleActivateUser}
-              className="mb-6 p-4 bg-blue-50 rounded-lg"
+              className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
             >
-              <h3 className="font-medium text-gray-900 mb-3">Ativar usuário</h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Ativar usuário</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Digite o email de um usuário que já tenha feito login no
                 sistema.
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email
                   </label>
                   <input
@@ -161,12 +161,12 @@ export default function AdminPage() {
                     placeholder="email@exemplo.com"
                     required
                     disabled={activateLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Permissão
                   </label>
                   <select
@@ -175,7 +175,7 @@ export default function AdminPage() {
                       setActivateRole(e.target.value as "admin" | "user")
                     }
                     disabled={activateLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
                   >
                     <option value="user">Usuário</option>
                     <option value="admin">Administrador</option>
@@ -183,14 +183,14 @@ export default function AdminPage() {
                 </div>
 
                 {activateError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-sm text-red-600">{activateError}</p>
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3">
+                    <p className="text-sm text-red-600 dark:text-red-400">{activateError}</p>
                   </div>
                 )}
 
                 {activateSuccess && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-sm text-green-600">
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
+                    <p className="text-sm text-green-600 dark:text-green-400">
                       Usuário ativado com sucesso!
                     </p>
                   </div>
@@ -205,7 +205,7 @@ export default function AdminPage() {
                       setActivateEmail("");
                     }}
                     disabled={activateLoading}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
                   >
                     Cancelar
                   </button>
@@ -223,14 +223,14 @@ export default function AdminPage() {
 
           {/* Usuários Ativos */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Ativos ({activeUsers.length})
             </h3>
             <div className="space-y-2">
               {activeUsers.map((userData: any) => (
                 <div
                   key={userData.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
                     {userData.image ? (
@@ -241,15 +241,15 @@ export default function AdminPage() {
                         className="h-10 w-10 rounded-full"
                       />
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-gray-600" />
+                      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </div>
                     )}
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
                         {userData.name || userData.email}
                       </p>
-                      <p className="text-sm text-gray-500">{userData.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{userData.email}</p>
                     </div>
                   </div>
 
@@ -257,8 +257,8 @@ export default function AdminPage() {
                     <span
                       className={`text-sm px-3 py-1 rounded-full ${
                         userData.role === "admin"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-green-100 text-green-800"
+                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300"
+                          : "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
                       }`}
                     >
                       {userData.role === "admin" ? (
@@ -270,7 +270,7 @@ export default function AdminPage() {
                         "Usuário"
                       )}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(userData.createdAt).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
@@ -282,14 +282,14 @@ export default function AdminPage() {
           {/* Usuários Pendentes */}
           {pendingUsers.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-3">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Pendentes de Ativação ({pendingUsers.length})
               </h3>
               <div className="space-y-2">
                 {pendingUsers.map((userData: any) => (
                   <div
                     key={userData.id}
-                    className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200"
+                    className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700"
                   >
                     <div className="flex items-center gap-3">
                       {userData.image ? (
@@ -300,25 +300,25 @@ export default function AdminPage() {
                           className="h-10 w-10 rounded-full"
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <Users className="h-5 w-5 text-gray-600" />
+                        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center">
+                          <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-900 dark:text-gray-100">
                           {userData.name || userData.email}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {userData.email}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+                      <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
                         Aguardando ativação
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(userData.createdAt).toLocaleDateString(
                           "pt-BR",
                         )}

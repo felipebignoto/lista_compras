@@ -47,7 +47,7 @@ export default function AuthButton() {
           <span className="hidden sm:inline">Admin</span>
         </Link>
       )}
-      <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200">
+      <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600">
         {user.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={user.image} alt="Avatar" className="h-8 w-8 rounded-full" />
@@ -55,7 +55,7 @@ export default function AuthButton() {
           <UserIcon className="h-8 w-8 text-gray-400" />
         )}
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {user.name || user.email}
           </span>
           {isAdmin && (

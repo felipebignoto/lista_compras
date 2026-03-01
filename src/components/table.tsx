@@ -13,19 +13,19 @@ export default function Table(props: TabelaProps) {
     <>
       {/* Layout Desktop (Tabela) - oculto em mobile */}
       <div className="hidden md:block w-full overflow-x-auto">
-        <table className="w-full border border-slate-300 rounded-xl overflow-hidden shadow-lg bg-white">
+        <table className="w-full border border-slate-300 dark:border-slate-600 rounded-xl overflow-hidden shadow-lg bg-white dark:bg-slate-800">
           <thead>
-            <tr className="bg-gradient-to-r from-indigo-100 to-purple-100">
-              <th className="text-left p-4 font-semibold text-indigo-900">
+            <tr className="bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900">
+              <th className="text-left p-4 font-semibold text-indigo-900 dark:text-indigo-200">
                 ✓
               </th>
-              <th className="text-left p-4 font-semibold text-indigo-900">
+              <th className="text-left p-4 font-semibold text-indigo-900 dark:text-indigo-200">
                 Nome
               </th>
-              <th className="text-left p-4 font-semibold text-indigo-900">
+              <th className="text-left p-4 font-semibold text-indigo-900 dark:text-indigo-200">
                 Observação
               </th>
-              <th className="text-center p-4 font-semibold text-indigo-900">
+              <th className="text-center p-4 font-semibold text-indigo-900 dark:text-indigo-200">
                 Ações
               </th>
             </tr>
@@ -35,7 +35,7 @@ export default function Table(props: TabelaProps) {
               props.item.map((item, i) => (
                 <tr
                   key={item.itemId}
-                  className={`${i % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-indigo-50 transition-colors border-b border-slate-200 ${
+                  className={`${i % 2 === 0 ? "bg-white dark:bg-slate-800" : "bg-slate-50 dark:bg-slate-750"} hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors border-b border-slate-200 dark:border-slate-700 ${
                     item.itemChecked ? "opacity-50" : ""
                   }`}
                 >
@@ -62,8 +62,8 @@ export default function Table(props: TabelaProps) {
                     }}
                     className={`text-left p-4 cursor-pointer ${
                       item.itemChecked
-                        ? "line-through text-slate-500"
-                        : "text-slate-900"
+                        ? "line-through text-slate-500 dark:text-slate-500"
+                        : "text-slate-900 dark:text-slate-100"
                     }`}
                   >
                     {item.itemNome}
@@ -74,7 +74,7 @@ export default function Table(props: TabelaProps) {
                     onClick={() => {
                       props.itemSelecionado?.(item);
                     }}
-                    className="text-left p-4 cursor-pointer text-slate-600 text-sm"
+                    className="text-left p-4 cursor-pointer text-slate-600 dark:text-slate-400 text-sm"
                   >
                     {item.itemObservacao || "-"}
                   </td>
@@ -104,7 +104,7 @@ export default function Table(props: TabelaProps) {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center p-8 text-slate-500">
+                <td colSpan={4} className="text-center p-8 text-slate-500 dark:text-slate-400">
                   Nenhum item adicionado ainda
                 </td>
               </tr>
@@ -119,7 +119,7 @@ export default function Table(props: TabelaProps) {
           props.item.map((item) => (
             <div
               key={item.itemId}
-              className={`border border-slate-300 rounded-xl p-4 bg-white shadow-md ${
+              className={`border border-slate-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 shadow-md ${
                 item.itemChecked ? "opacity-50" : ""
               }`}
             >
@@ -142,14 +142,14 @@ export default function Table(props: TabelaProps) {
                     onClick={() => props.itemSelecionado?.(item)}
                     className={`font-medium text-lg leading-tight ${
                       item.itemChecked
-                        ? "line-through text-slate-500"
-                        : "text-slate-900"
+                        ? "line-through text-slate-500 dark:text-slate-500"
+                        : "text-slate-900 dark:text-slate-100"
                     }`}
                   >
                     {item.itemNome}
                   </h3>
                   {item.itemObservacao && (
-                    <p className="text-sm text-slate-600 mt-1 break-words">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 break-words">
                       {item.itemObservacao}
                     </p>
                   )}
@@ -157,7 +157,7 @@ export default function Table(props: TabelaProps) {
               </div>
 
               {/* Ações */}
-              <div className="flex gap-2 justify-end pt-2 border-t border-slate-200">
+              <div className="flex gap-2 justify-end pt-2 border-t border-slate-200 dark:border-slate-600">
                 {props.itemSelecionado && (
                   <button
                     onClick={() => props.itemSelecionado?.(item)}
@@ -180,7 +180,7 @@ export default function Table(props: TabelaProps) {
             </div>
           ))
         ) : (
-          <div className="text-center p-8 text-slate-500 bg-white rounded-xl border border-slate-300">
+          <div className="text-center p-8 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-600">
             Nenhum item adicionado ainda
           </div>
         )}

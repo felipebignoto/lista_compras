@@ -165,29 +165,29 @@ export default function ListManagementPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen dark:bg-slate-900">
+        <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
       </div>
     );
   }
 
   if (!list) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">Lista não encontrada</p>
+      <div className="flex items-center justify-center min-h-screen dark:bg-slate-900">
+        <p className="text-gray-600 dark:text-gray-400">Lista não encontrada</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
             >
               <ArrowLeft className="h-6 w-6" />
             </Link>
@@ -198,7 +198,7 @@ export default function ListManagementPage() {
                     type="text"
                     value={newListName}
                     onChange={(e) => setNewListName(e.target.value)}
-                    className="text-2xl font-bold text-gray-900 px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="text-2xl font-bold text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-700 px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     autoFocus
                     disabled={editNameLoading}
                   />
@@ -219,32 +219,32 @@ export default function ListManagementPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {list.name}
                   </h1>
                   {(isOwner ||
                     list.members[user?.uid || ""]?.role === "editor") && (
                     <button
                       onClick={startEditName}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
                   )}
                 </div>
               )}
-              <p className="text-sm text-gray-500">Gerenciar lista</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Gerenciar lista</p>
             </div>
           </div>
           <AuthButton />
         </div>
 
         {/* Membros */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Membros ({Object.keys(list.members).length})
               </h2>
             </div>
@@ -263,19 +263,19 @@ export default function ListManagementPage() {
           {showAddForm && (
             <form
               onSubmit={handleAddMember}
-              className="mb-6 p-4 bg-blue-50 rounded-lg"
+              className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
             >
-              <h3 className="font-medium text-gray-900 mb-3">
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
                 Adicionar membro
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Digite o email de um usuário que já tenha feito login no
                 sistema.
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email
                   </label>
                   <input
@@ -285,12 +285,12 @@ export default function ListManagementPage() {
                     placeholder="email@exemplo.com"
                     required
                     disabled={addLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Permissão
                   </label>
                   <select
@@ -299,7 +299,7 @@ export default function ListManagementPage() {
                       setMemberRole(e.target.value as "editor" | "viewer")
                     }
                     disabled={addLoading}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
                   >
                     <option value="editor">
                       Editor (pode adicionar e editar)
@@ -311,14 +311,14 @@ export default function ListManagementPage() {
                 </div>
 
                 {addError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-sm text-red-600">{addError}</p>
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3">
+                    <p className="text-sm text-red-600 dark:text-red-400">{addError}</p>
                   </div>
                 )}
 
                 {addSuccess && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-sm text-green-600">
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
+                    <p className="text-sm text-green-600 dark:text-green-400">
                       Membro adicionado com sucesso!
                     </p>
                   </div>
@@ -333,7 +333,7 @@ export default function ListManagementPage() {
                       setMemberEmail("");
                     }}
                     disabled={addLoading}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
                   >
                     Cancelar
                   </button>
@@ -356,7 +356,7 @@ export default function ListManagementPage() {
               return (
                 <div
                   key={uid}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
                     {userData?.image ? (
@@ -367,20 +367,20 @@ export default function ListManagementPage() {
                         className="h-10 w-10 rounded-full"
                       />
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-gray-600" />
+                      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-slate-600 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                       </div>
                     )}
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
                         {userData?.name || userData?.email || "Usuário"}
                         {list.ownerId === uid && (
-                          <span className="ml-2 text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                          <span className="ml-2 text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded">
                             Dono
                           </span>
                         )}
                       </p>
-                      <p className="text-sm text-gray-500">{userData?.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{userData?.email}</p>
                     </div>
                   </div>
 
@@ -388,10 +388,10 @@ export default function ListManagementPage() {
                     <span
                       className={`text-sm px-3 py-1 rounded-full ${
                         member.role === "owner"
-                          ? "bg-blue-100 text-blue-800"
+                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                           : member.role === "editor"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                            : "bg-gray-100 dark:bg-slate-600 text-gray-800 dark:text-gray-200"
                       }`}
                     >
                       {member.role === "owner"
@@ -404,7 +404,7 @@ export default function ListManagementPage() {
                     {isOwner && list.ownerId !== uid && (
                       <button
                         onClick={() => handleRemoveMember(uid)}
-                        className="text-red-600 hover:text-red-800 transition-colors"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
